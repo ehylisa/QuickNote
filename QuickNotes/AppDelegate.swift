@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import ServiceManagement
 import SwiftUI
 
 @MainActor
@@ -60,13 +61,50 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showStatusMenu() {
         let menu = NSMenu()
+
+        menu.addItem(NSMenuItem(title: "New Note",
+                                action: #selector(newNote),
+                                keyEquivalent: ""))
+
+        menu.addItem(.separator())
+
+        let loginItem = NSMenuItem(title: "Launch at Login",
+                                   action: #selector(toggleLaunchAtLogin),
+                                   keyEquivalent: "")
+        loginItem.state = launchAtLoginEnabled ? .on : .off
+        menu.addItem(loginItem)
+
+        menu.addItem(.separator())
+
         menu.addItem(NSMenuItem(title: "Quit QuickNotes",
                                 action: #selector(quitApp),
                                 keyEquivalent: "q"))
-        // Temporarily assign menu so the system can show it, then clear it
         statusItem.menu = menu
         statusItem.button?.performClick(nil)
         statusItem.menu = nil
+    }
+
+    // MARK: Launch at Login
+
+    private var launchAtLoginEnabled: Bool {
+        SMAppService.mainApp.status == .enabled
+    }
+
+    @objc private func toggleLaunchAtLogin() {
+        do {
+            if launchAtLoginEnabled {
+                try SMAppService.mainApp.unregister()
+            } else {
+                try SMAppService.mainApp.register()
+            }
+        } catch {
+            print("QuickNotes: launch-at-login toggle failed — \(error)")
+        }
+    }
+
+    @objc func newNote() {
+        store.addNote()
+        if !popover.isShown { openPopover() }
     }
 
     @objc func quitApp() {
