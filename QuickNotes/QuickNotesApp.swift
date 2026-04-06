@@ -2,16 +2,5 @@
 //  QuickNotesApp.swift
 //  QuickNotes
 //
-//  Created by Lisa Yi on 2026-04-05.
+//  Entry point is main.swift — this file is intentionally empty.
 //
-
-import SwiftUI
-
-@main
-struct QuickNotesApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-}
